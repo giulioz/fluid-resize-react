@@ -1,8 +1,5 @@
 {
   "env": {
     "jest": true
-  },
-  "rules": {
-    "no-extra-semi": "off"
   }
 }

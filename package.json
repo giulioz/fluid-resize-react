@@ -1,6 +1,6 @@
 {
   "name": "fluid-resize-react",
-  "version": "1.0.1",
+  "version": "1.2.1",
   "description": "Scale props to fill a container using binary search",
   "keywords": [
     "scale","text","layout","auto","text","fit","fill","responsive"

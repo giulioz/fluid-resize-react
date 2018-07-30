@@ -5,6 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var React = _interopDefault(require('react'));
+var PropTypes = _interopDefault(require('prop-types'));
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -94,86 +95,69 @@ var FixedWidth = function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = FixedWidth.__proto__ || Object.getPrototypeOf(FixedWidth)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-      upperBound: _this.props.max,
-      lowerBound: _this.props.min,
-      current: (_this.props.max + _this.props.min) / 2,
-      steps: 0
-    }, _this.outer = React.createRef(), _this.inner = React.createRef(), _temp), possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = FixedWidth.__proto__ || Object.getPrototypeOf(FixedWidth)).call.apply(_ref, [this].concat(args))), _this), _this.steps = 0, _this.lowerBound = _this.props.min, _this.upperBound = _this.props.max, _this.state = {
+      current: (_this.props.max + _this.props.min) / 2
+    }, _this.outer = React.createRef(), _this.inner = React.createRef(), _this.update = function () {
+      var outerRect = _this.outer.current.getBoundingClientRect();
+      var innerRect = _this.inner.current.getBoundingClientRect();
+
+      // console.log(this.steps, Math.abs(innerRect.width - outerRect.width));
+
+      if (Math.abs(innerRect.width - outerRect.width) > _this.props.delta && _this.steps < _this.props.maxSteps) {
+        if (outerRect.width > innerRect.width) {
+          _this.lowerBound = _this.state.current;
+          _this.steps++;
+          _this.setState({
+            current: (_this.upperBound + _this.lowerBound) / 2
+          });
+        } else if (outerRect.width < innerRect.width) {
+          _this.upperBound = _this.state.current;
+          _this.steps++;
+          _this.setState({
+            current: (_this.upperBound + _this.lowerBound) / 2
+          });
+        }
+      } else {
+        _this.steps = 0;
+        _this.lowerBound = _this.props.min;
+        _this.upperBound = _this.props.max;
+      }
+    }, _temp), possibleConstructorReturn(_this, _ret);
   }
 
   createClass(FixedWidth, [{
-    key: 'componentDidMount',
+    key: "componentDidMount",
     value: function componentDidMount() {
+      window.addEventListener("resize", this.update);
       this.update();
     }
   }, {
-    key: 'componentDidUpdate',
+    key: "componentDidUpdate",
     value: function componentDidUpdate() {
       this.update();
+      // this.steps = 0;
+      // this.lowerBound = this.props.min;
+      // this.upperBound = this.props.max;
     }
   }, {
-    key: 'update',
-    value: function update() {
-      var outerRect = this.outer.current.getBoundingClientRect();
-      var innerRect = this.inner.current.getBoundingClientRect();
-
-      if (this.state.steps < this.props.maxSteps) {
-        if (outerRect.width > innerRect.width) {
-          this.setState(function (_ref2) {
-            var lowerBound = _ref2.lowerBound,
-                upperBound = _ref2.upperBound,
-                current = _ref2.current,
-                steps = _ref2.steps;
-            return {
-              lowerBound: current,
-              upperBound: upperBound,
-              steps: steps + 1
-            };
-          });
-          this.setState(function (_ref3) {
-            var lowerBound = _ref3.lowerBound,
-                upperBound = _ref3.upperBound;
-            return {
-              current: (upperBound + lowerBound) / 2
-            };
-          });
-        } else if (outerRect.width < innerRect.width) {
-          this.setState(function (_ref4) {
-            var lowerBound = _ref4.lowerBound,
-                upperBound = _ref4.upperBound,
-                current = _ref4.current,
-                steps = _ref4.steps;
-            return {
-              lowerBound: lowerBound,
-              upperBound: current,
-              steps: steps + 1
-            };
-          });
-          this.setState(function (_ref5) {
-            var lowerBound = _ref5.lowerBound,
-                upperBound = _ref5.upperBound;
-            return {
-              current: (upperBound + lowerBound) / 2
-            };
-          });
-        }
-      }
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      window.removeEventListener("resize", this.update);
     }
   }, {
-    key: 'render',
+    key: "render",
     value: function render() {
       var _props = this.props,
           children = _props.children,
-          rest = objectWithoutProperties(_props, ['children']);
+          rest = objectWithoutProperties(_props, ["children"]);
 
 
       return React.createElement(
-        'div',
+        "div",
         _extends({ ref: this.outer }, rest),
         React.createElement(
-          'div',
-          { style: { display: 'inline-block' }, ref: this.inner },
+          "div",
+          { style: { display: "inline-block" }, ref: this.inner },
           this.props.children(this.state.current)
         )
       );
@@ -185,7 +169,16 @@ var FixedWidth = function (_React$Component) {
 FixedWidth.defaultProps = {
   maxSteps: 10,
   min: 5,
-  max: 100
+  max: 100,
+  delta: 5
+};
+
+
+FixedWidth.propTypes = {
+  maxSteps: PropTypes.number,
+  min: PropTypes.number,
+  max: PropTypes.number,
+  children: PropTypes.element.isRequired
 };
 
 var FixedHeight = function (_React$Component) {
@@ -202,86 +195,69 @@ var FixedHeight = function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = FixedHeight.__proto__ || Object.getPrototypeOf(FixedHeight)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-      upperBound: _this.props.max,
-      lowerBound: _this.props.min,
-      current: (_this.props.max + _this.props.min) / 2,
-      steps: 0
-    }, _this.outer = React.createRef(), _this.inner = React.createRef(), _temp), possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = FixedHeight.__proto__ || Object.getPrototypeOf(FixedHeight)).call.apply(_ref, [this].concat(args))), _this), _this.steps = 0, _this.lowerBound = _this.props.min, _this.upperBound = _this.props.max, _this.state = {
+      current: (_this.props.max + _this.props.min) / 2
+    }, _this.outer = React.createRef(), _this.inner = React.createRef(), _this.update = function () {
+      var outerRect = _this.outer.current.getBoundingClientRect();
+      var innerRect = _this.inner.current.getBoundingClientRect();
+
+      // console.log(this.steps, Math.abs(innerRect.height - outerRect.height));
+
+      if (Math.abs(innerRect.height - outerRect.height) > _this.props.delta && _this.steps < _this.props.maxSteps) {
+        if (outerRect.height > innerRect.height) {
+          _this.lowerBound = _this.state.current;
+          _this.steps++;
+          _this.setState({
+            current: (_this.upperBound + _this.lowerBound) / 2
+          });
+        } else if (outerRect.height < innerRect.height) {
+          _this.upperBound = _this.state.current;
+          _this.steps++;
+          _this.setState({
+            current: (_this.upperBound + _this.lowerBound) / 2
+          });
+        }
+      } else {
+        _this.steps = 0;
+        _this.lowerBound = _this.props.min;
+        _this.upperBound = _this.props.max;
+      }
+    }, _temp), possibleConstructorReturn(_this, _ret);
   }
 
   createClass(FixedHeight, [{
-    key: 'componentDidMount',
+    key: "componentDidMount",
     value: function componentDidMount() {
+      window.addEventListener("resize", this.update);
       this.update();
     }
   }, {
-    key: 'componentDidUpdate',
+    key: "componentDidUpdate",
     value: function componentDidUpdate() {
       this.update();
+      // this.steps = 0;
+      // this.lowerBound = this.props.min;
+      // this.upperBound = this.props.max;
     }
   }, {
-    key: 'update',
-    value: function update() {
-      var outerRect = this.outer.current.getBoundingClientRect();
-      var innerRect = this.inner.current.getBoundingClientRect();
-
-      if (this.state.steps < this.props.maxSteps) {
-        if (outerRect.height > innerRect.height) {
-          this.setState(function (_ref2) {
-            var lowerBound = _ref2.lowerBound,
-                upperBound = _ref2.upperBound,
-                current = _ref2.current,
-                steps = _ref2.steps;
-            return {
-              lowerBound: current,
-              upperBound: upperBound,
-              steps: steps + 1
-            };
-          });
-          this.setState(function (_ref3) {
-            var lowerBound = _ref3.lowerBound,
-                upperBound = _ref3.upperBound;
-            return {
-              current: (upperBound + lowerBound) / 2
-            };
-          });
-        } else if (outerRect.height < innerRect.height) {
-          this.setState(function (_ref4) {
-            var lowerBound = _ref4.lowerBound,
-                upperBound = _ref4.upperBound,
-                current = _ref4.current,
-                steps = _ref4.steps;
-            return {
-              lowerBound: lowerBound,
-              upperBound: current,
-              steps: steps + 1
-            };
-          });
-          this.setState(function (_ref5) {
-            var lowerBound = _ref5.lowerBound,
-                upperBound = _ref5.upperBound;
-            return {
-              current: (upperBound + lowerBound) / 2
-            };
-          });
-        }
-      }
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      window.removeEventListener("resize", this.update);
     }
   }, {
-    key: 'render',
+    key: "render",
     value: function render() {
       var _props = this.props,
           children = _props.children,
-          rest = objectWithoutProperties(_props, ['children']);
+          rest = objectWithoutProperties(_props, ["children"]);
 
 
       return React.createElement(
-        'div',
+        "div",
         _extends({ ref: this.outer }, rest),
         React.createElement(
-          'div',
-          { style: { display: 'inline-block' }, ref: this.inner },
+          "div",
+          { style: { display: "inline-block" }, ref: this.inner },
           this.props.children(this.state.current)
         )
       );
@@ -293,7 +269,16 @@ var FixedHeight = function (_React$Component) {
 FixedHeight.defaultProps = {
   maxSteps: 10,
   min: 5,
-  max: 100
+  max: 100,
+  delta: 5
+};
+
+
+FixedHeight.propTypes = {
+  maxSteps: PropTypes.number,
+  min: PropTypes.number,
+  max: PropTypes.number,
+  children: PropTypes.element.isRequired
 };
 
 var FixedSize = function (_React$Component) {
@@ -310,86 +295,69 @@ var FixedSize = function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = FixedSize.__proto__ || Object.getPrototypeOf(FixedSize)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-      upperBound: _this.props.max,
-      lowerBound: _this.props.min,
-      current: (_this.props.max + _this.props.min) / 2,
-      steps: 0
-    }, _this.outer = React.createRef(), _this.inner = React.createRef(), _temp), possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this = possibleConstructorReturn(this, (_ref = FixedSize.__proto__ || Object.getPrototypeOf(FixedSize)).call.apply(_ref, [this].concat(args))), _this), _this.steps = 0, _this.lowerBound = _this.props.min, _this.upperBound = _this.props.max, _this.state = {
+      current: (_this.props.max + _this.props.min) / 2
+    }, _this.outer = React.createRef(), _this.inner = React.createRef(), _this.update = function () {
+      var outerRect = _this.outer.current.getBoundingClientRect();
+      var innerRect = _this.inner.current.getBoundingClientRect();
+
+      // console.log(this.steps, Math.abs(innerRect.height - outerRect.height));
+
+      if (Math.abs(innerRect.width - outerRect.width) > _this.props.delta && Math.abs(innerRect.height - outerRect.height) > _this.props.delta && _this.steps < _this.props.maxSteps) {
+        if (outerRect.width > innerRect.width && outerRect.height > innerRect.height) {
+          _this.lowerBound = _this.state.current;
+          _this.steps++;
+          _this.setState({
+            current: (_this.upperBound + _this.lowerBound) / 2
+          });
+        } else if (outerRect.width < innerRect.width || outerRect.height < innerRect.height) {
+          _this.upperBound = _this.state.current;
+          _this.steps++;
+          _this.setState({
+            current: (_this.upperBound + _this.lowerBound) / 2
+          });
+        }
+      } else {
+        _this.steps = 0;
+        _this.lowerBound = _this.props.min;
+        _this.upperBound = _this.props.max;
+      }
+    }, _temp), possibleConstructorReturn(_this, _ret);
   }
 
   createClass(FixedSize, [{
-    key: 'componentDidMount',
+    key: "componentDidMount",
     value: function componentDidMount() {
+      window.addEventListener("resize", this.update);
       this.update();
     }
   }, {
-    key: 'componentDidUpdate',
+    key: "componentDidUpdate",
     value: function componentDidUpdate() {
       this.update();
+      // this.steps = 0;
+      // this.lowerBound = this.props.min;
+      // this.upperBound = this.props.max;
     }
   }, {
-    key: 'update',
-    value: function update() {
-      var outerRect = this.outer.current.getBoundingClientRect();
-      var innerRect = this.inner.current.getBoundingClientRect();
-
-      if (this.state.steps < this.props.maxSteps) {
-        if (outerRect.width > innerRect.width && outerRect.height > innerRect.height) {
-          this.setState(function (_ref2) {
-            var lowerBound = _ref2.lowerBound,
-                upperBound = _ref2.upperBound,
-                current = _ref2.current,
-                steps = _ref2.steps;
-            return {
-              lowerBound: current,
-              upperBound: upperBound,
-              steps: steps + 1
-            };
-          });
-          this.setState(function (_ref3) {
-            var lowerBound = _ref3.lowerBound,
-                upperBound = _ref3.upperBound;
-            return {
-              current: (upperBound + lowerBound) / 2
-            };
-          });
-        } else if (outerRect.width < innerRect.width || outerRect.height < innerRect.height) {
-          this.setState(function (_ref4) {
-            var lowerBound = _ref4.lowerBound,
-                upperBound = _ref4.upperBound,
-                current = _ref4.current,
-                steps = _ref4.steps;
-            return {
-              lowerBound: lowerBound,
-              upperBound: current,
-              steps: steps + 1
-            };
-          });
-          this.setState(function (_ref5) {
-            var lowerBound = _ref5.lowerBound,
-                upperBound = _ref5.upperBound;
-            return {
-              current: (upperBound + lowerBound) / 2
-            };
-          });
-        }
-      }
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      window.removeEventListener("resize", this.update);
     }
   }, {
-    key: 'render',
+    key: "render",
     value: function render() {
       var _props = this.props,
           children = _props.children,
-          rest = objectWithoutProperties(_props, ['children']);
+          rest = objectWithoutProperties(_props, ["children"]);
 
 
       return React.createElement(
-        'div',
+        "div",
         _extends({ ref: this.outer }, rest),
         React.createElement(
-          'div',
-          { style: { display: 'inline-block' }, ref: this.inner },
+          "div",
+          { style: { display: "inline-block" }, ref: this.inner },
           this.props.children(this.state.current)
         )
       );
@@ -401,7 +369,16 @@ var FixedSize = function (_React$Component) {
 FixedSize.defaultProps = {
   maxSteps: 10,
   min: 5,
-  max: 100
+  max: 100,
+  delta: 5
+};
+
+
+FixedSize.propTypes = {
+  maxSteps: PropTypes.number,
+  min: PropTypes.number,
+  max: PropTypes.number,
+  children: PropTypes.element.isRequired
 };
 
 exports.FixedWidth = FixedWidth;
